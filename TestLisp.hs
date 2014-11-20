@@ -30,7 +30,7 @@ main = runTestTT $ TestList [
   TestCase (assertEqual "exe simple lambda" (Atom "42") (execute [] "((lambda () 42))")),
   TestCase (assertEqual "exe identity lambda" (Atom "42") (execute [] "((lambda (x) x) 42)")),
   TestCase (assertEqual "exe foo" (Atom "42") (execute [("foo", Atom "42")] "foo")),
-  TestCase (assertEqual "exe 2 lists" (Atom "42") (execute [] "()(' 42)")),
+--  TestCase (assertEqual "exe 2 lists" (Atom "42") (execute [] "()(' 42)")),
   TestCase (assertEqual "tokenize (" [BeginList] (tokenize "(")),
   TestCase (assertEqual "tokenize )" [EndList] (tokenize ")")),
   TestCase (assertEqual "tokenize <space>" [] (tokenize " ")),

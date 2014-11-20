@@ -6,7 +6,7 @@ data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
 execute env code = aux env ast
-  where ast:[] = (parseMany.tokenize) code
+  where ast:_ = (parseMany.tokenize) code
         aux env (Atom name) = case findInEnv name env of
           Just a -> a
           Nothing -> Atom name
