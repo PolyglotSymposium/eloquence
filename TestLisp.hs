@@ -1,6 +1,9 @@
 module TestLisp where
 
 import Test.HUnit
+import Test.Hspec
+import Test.QuickCheck
+import Control.Exception (evaluate)
 
 import Lisp
 
