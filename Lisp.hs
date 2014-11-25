@@ -5,8 +5,11 @@ type ExecutionEnvironment = [(String, DataType)]
 data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (Show, Eq)
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
-execute env code = aux env ast
-  where ast:_ = (parseMany.tokenize) code
+execute env code = executeLevel env asts
+  where executeLevel env (ast:[]) = aux env ast
+        executeLevel env (ast:rest) = executeLevel env rest
+        executeLevel _ x = error (show x)
+        asts = (parseMany.tokenize) code
         aux env (Atom name) = case findInEnv name env of
           Just a -> a
           Nothing -> Atom name
