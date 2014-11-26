@@ -71,6 +71,8 @@ main = hspec $ do
     describe "def" $ do
       it "makes something available in later environments" $ do
         execute [] "(def foo 42) foo" `shouldBe` Atom "42"
+      it "works for making then applying the identity function" $ do
+        execute [] "(def identity (lambda (x) x)) (identity 42)" `shouldBe` Atom "42"
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
