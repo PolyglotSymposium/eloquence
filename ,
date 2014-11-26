@@ -7,7 +7,6 @@ data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
 execute env code = executeLevel env asts
   where executeLevel env (ast:[]) = aux env ast
-        executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, value):env) rest
         executeLevel env (ast:rest) = executeLevel env rest
         executeLevel _ x = error (show x)
         asts = (parseMany.tokenize) code

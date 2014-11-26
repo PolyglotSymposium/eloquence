@@ -68,6 +68,9 @@ main = hspec $ do
     describe "2 lists" $ do
       it "returns the result of the second one" $ do
         execute [] "() (quote 42)" `shouldBe` Atom "42"
+    describe "def" $ do
+      it "makes something available in later environments" $ do
+        execute [] "(def foo 42) foo" `shouldBe` Atom "42"
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
