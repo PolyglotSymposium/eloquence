@@ -75,6 +75,8 @@ main = hspec $ do
         execute [] "(def identity (lambda (x) x)) (identity 42)" `shouldBe` Atom "42"
       it "works for recursion" $ do
         execute [] "(def rec (lambda (x) (cond (eq? x (quote (42))) 35 1 (rec (tail x))))) (rec (quote (1 2 3 42)))" `shouldBe` Atom "35"
+      it "proves functions are closures" $ do
+        execute [] "(def id (lambda (x) x)) (def x 4) (id 42)" `shouldBe` Atom "42"
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
