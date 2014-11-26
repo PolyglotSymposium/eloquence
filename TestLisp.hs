@@ -1,14 +1,7 @@
 module TestLisp where
 
-import Test.HUnit
 import Test.Hspec
-import Test.QuickCheck
-import Control.Exception (evaluate)
-
 import Lisp
-
-isTruthy = not . isFalsey
-isFalsey = (== AList [])
 
 main :: IO ()
 main = hspec $ do
@@ -46,38 +39,67 @@ main = hspec $ do
         execute [] "(tail (quote (36 42 99)))" `shouldBe` AList [Atom "42", Atom "99"]
       it "is '([] 99), given (tail (quote (36 (eq? 42 8) 99)))" $ do
         execute [] "(tail (quote (36 (eq? 42 8) 99)))" `shouldBe` AList [AList [], Atom "99"]
-      it "is is falsey, given ()" $ do
+      it "is falsey, given ()" $ do
         execute [] "(tail ())" `shouldSatisfy` isFalsey
     describe "first" $ do
-      it "is is falsey, given ()" $ do
+      it "is falsey, given ()" $ do
         execute [] "(first ())" `shouldSatisfy` isFalsey
-    
---  TestCase (assertEqual "exe (first (quote (42)))" (Atom "42") (execute [] "(first (quote (42)))")),
---  TestCase (assertEqual "exe (first (quote ((eq? 42 8))))" (AList []) (execute [] "(first (quote ((eq? 42 8))))")),
---  TestCase (assertEqual "exe (cond truthy_thing 42)" (Atom "42") (execute [] "(cond truthy_thing 42)")),
---  TestCase (assertEqual "exe (cond falsey-thing 42)" (AList []) (execute [("falsey-thing", AList [])] "(cond falsey-thing 42)")),
---  TestCase (assertEqual "exe (cond falsey-thing 42 a 35)" (Atom "35") (execute [("falsey-thing", AList [])] "(cond falsey-thing 42 a 35)")),
---  TestCase (assertEqual "exe (cond falsey-thing 42 falsey-thing 35)" (AList []) (execute [("falsey-thing", AList [])] "(cond falsey-thing 42 falsey-thing 35)")),
---  TestCase (assertEqual "exe(bound) foo" (Atom "42") (execute [("foo", Atom "42")] "foo")),
---  TestCase (assertEqual "exe simple lambda" (Atom "42") (execute [] "((lambda () 42))")),
---  TestCase (assertEqual "exe identity lambda" (Atom "42") (execute [] "((lambda (x) x) 42)")),
---  TestCase (assertEqual "exe foo" (Atom "42") (execute [("foo", Atom "42")] "foo")),
---  TestCase (assertEqual "exe 2 lists" (Atom "42") (execute [] "()(' 42)")),
---  TestCase (assertEqual "tokenize (" [BeginList] (tokenize "(")),
---  TestCase (assertEqual "tokenize )" [EndList] (tokenize ")")),
---  TestCase (assertEqual "tokenize <space>" [] (tokenize " ")),
---  TestCase (assertEqual "tokenize ()" [BeginList, EndList] (tokenize "()")),
---  TestCase (assertEqual "tokenize )(" [EndList, BeginList] (tokenize ")(")),
---  TestCase (assertEqual "tokenize (quote foobar)" [BeginList, RawText "quote", RawText "foobar", EndList] (tokenize "(quote foobar)")),
---  TestCase (assertEqual "parse [BList, EList]" (AList []) (parse [BeginList, EndList])),
---  TestCase (assertEqual "parse [BeginList, RawText 'val', EndList]" (AList [Atom "val"]) (parse [BeginList, RawText "val", EndList])),
---  TestCase (assertEqual "parse two vals in a list" (AList [Atom "a", Atom "b"]) (parse [BeginList, RawText "a", RawText "b", EndList])),
---  TestCase (assertEqual "parse [RawText 'val']" (Atom "val") (parse [RawText "val"])),
---  TestCase (assertEqual "parse List within" (AList [AList []]) (parse [BeginList, BeginList, EndList, EndList])),
---  TestCase (assertEqual "parse complex nesting" (AList [AList [Atom "bar"], Atom "foo"]) (parse [BeginList, BeginList, RawText "bar", EndList, RawText "foo", EndList])),
---  TestCase (assertEqual "parseMany 2 atoms" [Atom "foo", Atom "bar"] (parseMany [RawText "foo", RawText "bar"])),
---  TestCase (assertEqual "parseMany 2 lists" [AList [], AList []] (parseMany [BeginList, EndList, BeginList, EndList])),
---  TestCase (assertEqual "tokenize a" [RawText "a"] (tokenize "a")),
---  TestCase (assertEqual "tokenize foobar" [RawText "foobar"] (tokenize "foobar")),
---  TestCase (assertEqual "tokenize b" [RawText "b"] (tokenize "b")),
---  TestCase (assertEqual "tokenize nexted" [BeginList, RawText "empty?", BeginList, EndList, EndList] (tokenize "(empty? ())"))]
+      it "is 42, given (quote (42))" $ do
+        execute [] "(first (quote (42)))" `shouldBe` Atom "42"
+      it "is (), given (quote (quote ((eq? 42 8))))" $ do
+        execute [] "(first (quote ((eq? 42 8))))" `shouldBe` AList []
+    describe "cond" $ do
+      context "when the environment contains a truthy thing and a falsey thing" $ do
+        let env = [("truthy-thing", Atom "42"), ("falsey-thing", AList [])]
+        it "is the value at the first truthy thing" $ do
+          execute env "(cond truthy-thing 42)" `shouldBe` Atom "42"
+        it "is falsey, given only falsey things" $ do
+          execute env "(cond falsey-thing 42)" `shouldSatisfy` isFalsey
+        it "is the second thing's value, given a falsey thing then a truthy thing" $ do
+          execute env "(cond falsey-thing 42 truthy-thing 35)" `shouldBe` Atom "35"
+    describe "simple variable lookup" $ do
+      it "works for values in the environment" $ do
+        execute [("foo", Atom "42")] "foo" `shouldBe` Atom "42"
+    describe "lambda" $ do
+      it "returns its value, when it is simple" $ do
+        execute [] "((lambda () 42))" `shouldBe` Atom "42"
+      it "can use its param, given one" $ do
+        execute [] "((lambda (x) x) 42)" `shouldBe` Atom "42"
+    describe "2 lists" $ do
+      it "returns the result of the second one" $ do
+        execute [] "() (quote 42)" `shouldBe` Atom "42"
+
+  describe "tokenize" $ do
+    "(" `shouldTokenizeTo` [BeginList]
+    ")" `shouldTokenizeTo` [EndList]
+    " " `shouldTokenizeTo` []
+    "()" `shouldTokenizeTo` [BeginList, EndList]
+    ")(" `shouldTokenizeTo` [EndList, BeginList]
+    ")(" `shouldTokenizeTo` [EndList, BeginList]
+    "(quote foobar)" `shouldTokenizeTo` [BeginList, RawText "quote", RawText "foobar", EndList]
+    "a" `shouldTokenizeTo` [RawText "a"]
+    "foobar" `shouldTokenizeTo` [RawText "foobar"]
+    "(empty? ())" `shouldTokenizeTo` [BeginList, RawText "empty?", BeginList, EndList, EndList]
+
+  describe "parse" $ do
+    [BeginList, EndList] `shouldParseTo` AList []
+    [BeginList, RawText "val", EndList] `shouldParseTo` AList [Atom "val"]
+    [BeginList, RawText "a", RawText "b", EndList] `shouldParseTo` AList [Atom "a", Atom "b"]
+    [RawText "val"] `shouldParseTo` Atom "val"
+    [BeginList, BeginList, EndList, EndList] `shouldParseTo` AList [AList []]
+    [BeginList, BeginList, RawText "bar", EndList, RawText "foo", EndList] `shouldParseTo` AList [AList [Atom "bar"], Atom "foo"]
+
+  describe "parseMany" $ do
+    it "works for 2 atoms" $ do
+      parseMany [RawText "foo", RawText "bar"] `shouldBe` [Atom "foo", Atom "bar"]
+    it "works for 2 lists" $ do
+      parseMany [BeginList, EndList, BeginList, EndList] `shouldBe` [AList [], AList []]
+
+isTruthy = not . isFalsey
+isFalsey = (== AList [])
+
+shouldTokenizeTo = shouldComb tokenize
+shouldParseTo = shouldComb parse
+
+shouldComb f toOpOn expected = it ("returns " ++ (show expected) ++ ", given '" ++ (show toOpOn) ++ "'") $ do
+  f toOpOn `shouldBe` expected
