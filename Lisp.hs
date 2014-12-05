@@ -1,7 +1,5 @@
 module Lisp where
 
-import Data.Maybe (listToMaybe)
-
 type ExecutionEnvironment = [(String, DataType)]
 
 type Macro = (DataType -> DataType) -> [DataType] -> DataType
