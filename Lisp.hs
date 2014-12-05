@@ -32,7 +32,6 @@ execute env code = executeLevel env asts
         aux env (AList (Atom "first":xs:_)) = case aux env xs of
           AList (x:_) -> aux env x
           _ -> AList []
-        aux env (AList (Atom "neg":x:_)) = Atom . show $ -(asInt $ aux env x)
         aux env (AList (Atom "cond":vs)) = cond env vs
           where cond env (p:e:rest)
                   | aux env p == AList [] = cond env rest
@@ -50,8 +49,11 @@ findMacro n = aux n macros
   where aux _ [] = Nothing
         aux n ((n', m):rest) = if n == n' then Just m else aux n rest
 
-macros = [(
-  "+", (\eval -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0))]
+macros = mathyMacros
+
+mathyMacros = [(
+  "+",   \eval       -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0),(
+  "neg", \eval (x:_) -> Atom . show $ -(asInt $ eval x))]
 
 asInt (Atom v) = read v
 
