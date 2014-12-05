@@ -2,6 +2,9 @@ module Lisp where
 
 type ExecutionEnvironment = [(String, DataType)]
 
+-- eval function -> args -> new code
+type Macro = (DataType -> DataType) -> [DataType] -> DataType
+
 data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (Show, Eq)
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
@@ -30,7 +33,6 @@ execute env code = executeLevel env asts
         aux env (AList (Atom "first":xs:_)) = case aux env xs of
           AList (x:_) -> aux env x
           _ -> AList []
-        aux env (AList (Atom "+":xs)) = Atom . show $ foldl (\o -> (+) o . asInt . aux env) 0 xs
         aux env (AList (Atom "neg":x:_)) = Atom . show $ -(asInt $ aux env x)
         aux env (AList (Atom "cond":vs)) = cond env vs
           where cond env (p:e:rest)
@@ -41,7 +43,16 @@ execute env code = executeLevel env asts
         aux env (AList (Atom "lambda":AList params:body:_)) = Fn (map (\(Atom x) -> x) params) body
         aux env (AList (fn:rest)) = apply (aux env fn) rest env
           where apply (Fn names body) values env = let nextEnv = bind names (map (aux env) values) env in aux nextEnv body
-                apply (Atom fn) _ _ = error $ "Could not apply fn: " ++ fn
+                apply (Atom fn) values env = case findMacro fn of
+                  Nothing -> error $ "Could not apply fn: " ++ fn
+                  Just macro -> aux env $ macro (aux env) values
+
+findMacro n = aux n macros
+  where aux _ [] = Nothing
+        aux n ((n', m):rest) = if n == n' then Just m else aux n rest
+
+macros = [(
+  "+", (\eval args -> Atom . show $ foldl (\o -> (+) o . asInt . eval) 0 args))]
 
 asInt (Atom v) = read v
 
