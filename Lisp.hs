@@ -1,5 +1,7 @@
 module Lisp where
 
+import Data.Maybe (listToMaybe)
+
 type ExecutionEnvironment = [(String, DataType)]
 
 type Macro = (DataType -> DataType) -> [DataType] -> DataType
@@ -13,7 +15,7 @@ execute env code = executeLevel env asts
         executeLevel env (ast:rest) = executeLevel env rest
         executeLevel _ x = AList []
         asts = (parseMany.tokenize) code
-        aux env (Atom name) = case findInEnv name env of
+        aux env (Atom name) = case lookup name env of
           Just a -> a
           Nothing -> Atom name
         aux _ (AList []) = AList []
@@ -40,13 +42,9 @@ execute env code = executeLevel env asts
         aux env (AList (Atom "lambda":AList params:body:_)) = Fn (map (\(Atom x) -> x) params) body
         aux env (AList (fn:rest)) = apply (aux env fn) rest env
           where apply (Fn names body) values env = let nextEnv = bind names (map (aux env) values) env in aux nextEnv body
-                apply (Atom fn) values env = case findMacro fn of
+                apply (Atom fn) values env = case lookup fn macros of
                   Just macro -> aux env $ macro (aux env) values
                   _ -> error $ "Could not apply fn: " ++ fn
-
-findMacro n = aux n macros
-  where aux _ [] = Nothing
-        aux n ((n', m):rest) = if n == n' then Just m else aux n rest
 
 macros = structuralMacros ++ mathyMacros
 
@@ -64,13 +62,7 @@ mathyMacros = [(
 
 asInt (Atom v) = read v
 
-bind [] [] env = env
-bind (name:names) (value:values) env = bind names values ((name, value):env)
-
-findInEnv _ [] = Nothing
-findInEnv someName ((name, value):envs)
-  | name == someName = Just value
-  | otherwise = findInEnv someName envs
+bind names values = (++) $ zip names values
 
 parseMany ((RawText named):rest) = Atom named:parseMany rest
 parseMany (BeginList:toParse) = AList body:parseMany rest
