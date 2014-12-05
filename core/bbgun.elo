@@ -3,6 +3,11 @@
 (def not (lambda (x) (cond x () 1 1)))
 
 (def take (lambda (n xs)
-  (if (eq? n 0)
+  (if (eq? 0 n)
     ()
     (cons (first xs) (take (- n 1) (tail xs))))))
+
+(def drop (lambda (n xs)
+  (if (eq? 0 n)
+    xs
+    (drop (- n 1) (tail xs)))))
