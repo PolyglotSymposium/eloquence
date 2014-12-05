@@ -31,6 +31,7 @@ execute env code = executeLevel env asts
           AList (x:_) -> aux env x
           _ -> AList []
         aux env (AList (Atom "+":xs)) = Atom . show $ foldl (\o -> (+) o . asInt . aux env) 0 xs
+        aux env (AList (Atom "neg":x:_)) = Atom . show $ -(asInt $ aux env x)
         aux env (AList (Atom "cond":vs)) = cond env vs
           where cond env (p:e:rest)
                   | aux env p == AList [] = cond env rest
