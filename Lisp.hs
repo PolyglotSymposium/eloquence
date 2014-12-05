@@ -2,7 +2,6 @@ module Lisp where
 
 type ExecutionEnvironment = [(String, DataType)]
 
--- eval function -> args -> new code
 type Macro = (DataType -> DataType) -> [DataType] -> DataType
 
 data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (Show, Eq)
@@ -52,7 +51,7 @@ findMacro n = aux n macros
         aux n ((n', m):rest) = if n == n' then Just m else aux n rest
 
 macros = [(
-  "+", (\eval args -> Atom . show $ foldl (\o -> (+) o . asInt . eval) 0 args))]
+  "+", (\eval -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0))]
 
 asInt (Atom v) = read v
 
