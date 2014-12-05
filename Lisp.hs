@@ -42,14 +42,17 @@ execute env code = executeLevel env asts
         aux env (AList (fn:rest)) = apply (aux env fn) rest env
           where apply (Fn names body) values env = let nextEnv = bind names (map (aux env) values) env in aux nextEnv body
                 apply (Atom fn) values env = case findMacro fn of
-                  Nothing -> error $ "Could not apply fn: " ++ fn
                   Just macro -> aux env $ macro (aux env) values
+                  _ -> error $ "Could not apply fn: " ++ fn
 
 findMacro n = aux n macros
   where aux _ [] = Nothing
         aux n ((n', m):rest) = if n == n' then Just m else aux n rest
 
-macros = mathyMacros
+macros = structuralMacros ++ mathyMacros
+
+structuralMacros = [(
+  "if", \_ (p:a:b:_) -> AList [Atom "cond", p, a, Atom "1", b])]
 
 mathyMacros = [(
   "+",   \eval       -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0),(

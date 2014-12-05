@@ -93,6 +93,13 @@ main = hspec $ do
         execute [] "(neg -42)" `shouldBe` Atom "42"
       it "uses the environment" $ do
         execute [("foo", Atom "42")] "(neg foo)" `shouldBe` Atom "-42"
+    describe "if" $ do
+      it "returns the 2nd arg if truthy" $ do
+        execute [] "(if 1 42 37)" `shouldBe` Atom "42"
+      it "returns the 3rd arg if falsey" $ do
+        execute [] "(if () 42 37)" `shouldBe` Atom "37"
+      it "does env lookups" $ do
+        execute [("f", AList []), ("p", Atom "66")] "(if f 42 p)" `shouldBe` Atom "66"
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
