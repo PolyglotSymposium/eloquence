@@ -1,3 +1,8 @@
 (def identity (lambda (x) x))
 
 (def not (lambda (x) (cond x () 1 1)))
+
+(def take (lambda (n xs)
+  (if (eq? n 0)
+    ()
+    (cons (first xs) (take (- n 1) (tail xs))))))
