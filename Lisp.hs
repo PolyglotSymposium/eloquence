@@ -30,6 +30,7 @@ execute env code = executeLevel env asts
         aux env (AList (Atom "first":xs:_)) = case aux env xs of
           AList (x:_) -> aux env x
           _ -> AList []
+        aux env (AList (Atom "+":x:y:_)) = Atom $ show ((asInt x) + (asInt y))
         aux env (AList (Atom "cond":vs)) = cond env vs
           where cond env (p:e:rest)
                   | aux env p == AList [] = cond env rest
@@ -40,6 +41,8 @@ execute env code = executeLevel env asts
         aux env (AList (fn:rest)) = apply (aux env fn) rest env
           where apply (Fn names body) values env = let nextEnv = bind names (map (aux env) values) env in aux nextEnv body
                 apply (Atom fn) _ _ = error $ "Could not apply fn: " ++ fn
+
+asInt (Atom v) = read v
 
 bind [] [] env = env
 bind (name:names) (value:values) env = bind names values ((name, value):env)
