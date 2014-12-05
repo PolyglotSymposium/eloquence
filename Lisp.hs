@@ -12,17 +12,18 @@ data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 aTruthyValue = AList [AList []]
 theFalseyValue = AList []
 
-execute env code = executeLevel env asts
+executeText env text = execute env  ((parseMany.tokenize) text)
+
+execute = executeLevel
   where executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, aux env value):env) rest
         executeLevel env (ast:[]) = aux env ast
         executeLevel env (ast:rest) = executeLevel env rest
         executeLevel _ x = aTruthyValue
-        asts = (parseMany.tokenize) code
         aux env (Atom name) = fromMaybe (Atom name) (lookup name env)
         aux _ (AList []) = AList []
         aux env (AList (Atom "quote":n:_)) = n
         aux env (AList (Atom "eq?":a:b:_)) = if aux env a == aux env b then aTruthyValue else theFalseyValue
-        aux env (AList (Atom "atom?":a:_)) = case (aux env a) of
+        aux env (AList (Atom "atom?":a:_)) = case aux env a of
           AList _ -> theFalseyValue
           _ -> aTruthyValue
         aux env (AList (Atom "cons":x:xs:_)) = case aux env xs of

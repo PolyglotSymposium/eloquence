@@ -5,119 +5,119 @@ import Lisp
 
 main :: IO ()
 main = hspec $ do
-  describe "executing" $ do
+  describe "executing text" $ do
     describe "different forms of empty lists" $ do
       it "is an empty list, given ()" $ do
-        execute [] "()" `shouldBe` AList []
+        executeText [] "()" `shouldBe` AList []
       it "is an empty list, given ( )" $ do
-        execute [] "( )" `shouldBe` AList []
+        executeText [] "( )" `shouldBe` AList []
     describe "quoted values" $ do
       it "is an empty list, given (quote ())" $ do
-        execute [] "(quote ())" `shouldBe` AList []
+        executeText [] "(quote ())" `shouldBe` AList []
       it "is an empty list, given '()" $ do
-        execute [] "'()" `shouldBe` AList []
+        executeText [] "'()" `shouldBe` AList []
     describe "eq?" $ do
       it "is truthy, given 42 and 42" $ do
-        execute [] "(eq? 42 42)" `shouldSatisfy` isTruthy
+        executeText [] "(eq? 42 42)" `shouldSatisfy` isTruthy
       it "is falsey, given 35 and 42" $ do
-        execute [] "(eq? 35 42)" `shouldSatisfy` isFalsey
+        executeText [] "(eq? 35 42)" `shouldSatisfy` isFalsey
     describe "atom?" $ do
       it "is truthy, given 42" $ do
-        execute [] "(atom? 42)" `shouldSatisfy` isTruthy
+        executeText [] "(atom? 42)" `shouldSatisfy` isTruthy
       it "is falsey, given ()" $ do
-        execute [] "(atom? ())" `shouldSatisfy` isFalsey
+        executeText [] "(atom? ())" `shouldSatisfy` isFalsey
       context "when the environment contains 'a-list' => ()" $ do
         it "is falsey, given a-list" $ do
-          execute [("a-list", AList [])] "(atom? a-list)" `shouldSatisfy` isFalsey
+          executeText [("a-list", AList [])] "(atom? a-list)" `shouldSatisfy` isFalsey
     describe "cons" $ do
       it "is '(42 34), given 42 and (quote (35))" $ do
-        execute [] "(cons 42 (quote (35)))" `shouldBe` AList [Atom "42", Atom "35"]
+        executeText [] "(cons 42 (quote (35)))" `shouldBe` AList [Atom "42", Atom "35"]
       it "is '(() 35), given (quote ()) (quote (35))" $ do
-        execute [] "(cons (quote ()) (quote (35)))" `shouldBe` AList [AList [], Atom "35"]
+        executeText [] "(cons (quote ()) (quote (35)))" `shouldBe` AList [AList [], Atom "35"]
     describe "tail" $ do
       it "is '(42 99), given (quote (36 42 99))" $ do
-        execute [] "(tail (quote (36 42 99)))" `shouldBe` AList [Atom "42", Atom "99"]
+        executeText [] "(tail (quote (36 42 99)))" `shouldBe` AList [Atom "42", Atom "99"]
       it "is '([] 99), given (tail (quote (36 (eq? 42 8) 99)))" $ do
-        execute [] "(tail (quote (36 (eq? 42 8) 99)))" `shouldBe` AList [AList [], Atom "99"]
+        executeText [] "(tail (quote (36 (eq? 42 8) 99)))" `shouldBe` AList [AList [], Atom "99"]
       it "is falsey, given ()" $ do
-        execute [] "(tail ())" `shouldSatisfy` isFalsey
+        executeText [] "(tail ())" `shouldSatisfy` isFalsey
     describe "first" $ do
       it "is falsey, given ()" $ do
-        execute [] "(first ())" `shouldSatisfy` isFalsey
+        executeText [] "(first ())" `shouldSatisfy` isFalsey
       it "is 42, given (quote (42))" $ do
-        execute [] "(first (quote (42)))" `shouldBe` Atom "42"
+        executeText [] "(first (quote (42)))" `shouldBe` Atom "42"
       it "is (), given (quote (quote ((eq? 42 8))))" $ do
-        execute [] "(first (quote ((eq? 42 8))))" `shouldBe` AList []
+        executeText [] "(first (quote ((eq? 42 8))))" `shouldBe` AList []
     describe "cond" $ do
       context "when the environment contains a truthy thing and a falsey thing" $ do
         let env = [("truthy-thing", Atom "42"), ("falsey-thing", AList [])]
         it "is the value at the first truthy thing" $ do
-          execute env "(cond truthy-thing 42)" `shouldBe` Atom "42"
+          executeText env "(cond truthy-thing 42)" `shouldBe` Atom "42"
         it "is falsey, given only falsey things" $ do
-          execute env "(cond falsey-thing 42)" `shouldSatisfy` isFalsey
+          executeText env "(cond falsey-thing 42)" `shouldSatisfy` isFalsey
         it "is the second thing's value, given a falsey thing then a truthy thing" $ do
-          execute env "(cond falsey-thing 42 truthy-thing 35)" `shouldBe` Atom "35"
+          executeText env "(cond falsey-thing 42 truthy-thing 35)" `shouldBe` Atom "35"
     describe "simple variable lookup" $ do
       it "works for values in the environment" $ do
-        execute [("foo", Atom "42")] "foo" `shouldBe` Atom "42"
+        executeText [("foo", Atom "42")] "foo" `shouldBe` Atom "42"
     describe "lambda" $ do
       it "returns its value, when it is simple" $ do
-        execute [] "((lambda () 42))" `shouldBe` Atom "42"
+        executeText [] "((lambda () 42))" `shouldBe` Atom "42"
       it "can use its param, given one" $ do
-        execute [] "((lambda (x) x) 42)" `shouldBe` Atom "42"
+        executeText [] "((lambda (x) x) 42)" `shouldBe` Atom "42"
       it "works for multiple values" $ do
-        execute [] "((lambda (x y) (cons x (cons y ()))) 1 2)" `shouldBe` AList [Atom "1", Atom "2"]
+        executeText [] "((lambda (x y) (cons x (cons y ()))) 1 2)" `shouldBe` AList [Atom "1", Atom "2"]
       it "can accept and apply other lambdas" $ do
-        execute [] "((lambda (x) (x)) (lambda () 42))" `shouldBe` Atom "42"
+        executeText [] "((lambda (x) (x)) (lambda () 42))" `shouldBe` Atom "42"
     describe "2 lists" $ do
       it "returns the result of the second one" $ do
-        execute [] "() (quote 42)" `shouldBe` Atom "42"
+        executeText [] "() (quote 42)" `shouldBe` Atom "42"
     describe "def" $ do
       it "makes something available in later environments" $ do
-        execute [] "(def foo 42) foo" `shouldBe` Atom "42"
+        executeText [] "(def foo 42) foo" `shouldBe` Atom "42"
       it "works for making then applying the identity function" $ do
-        execute [] "(def identity (lambda (x) x)) (identity 42)" `shouldBe` Atom "42"
+        executeText [] "(def identity (lambda (x) x)) (identity 42)" `shouldBe` Atom "42"
       it "works for recursion" $ do
-        execute [] "(def rec (lambda (x) (cond (eq? x (quote (42))) 35 1 (rec (tail x))))) (rec (quote (1 2 3 42)))" `shouldBe` Atom "35"
+        executeText [] "(def rec (lambda (x) (cond (eq? x (quote (42))) 35 1 (rec (tail x))))) (rec (quote (1 2 3 42)))" `shouldBe` Atom "35"
       it "proves functions are closures" $ do
-        execute [] "(def id (lambda (x) x)) (def x 4) (id 42)" `shouldBe` Atom "42"
+        executeText [] "(def id (lambda (x) x)) (def x 4) (id 42)" `shouldBe` Atom "42"
     describe "+" $ do
       it "works for 1 and 1" $ do
-        execute [] "(+ 1 1)" `shouldBe` Atom "2"
+        executeText [] "(+ 1 1)" `shouldBe` Atom "2"
       it "works for environmental lookups" $ do
-        execute [("foo", Atom "1"), ("bar", Atom "1")] "(+ foo bar)" `shouldBe` Atom "2"
+        executeText [("foo", Atom "1"), ("bar", Atom "1")] "(+ foo bar)" `shouldBe` Atom "2"
       it "works for a variable number of arguments" $ do
-        execute [] "(+ 1 2 3 4 5 6)" `shouldBe` Atom "21"
+        executeText [] "(+ 1 2 3 4 5 6)" `shouldBe` Atom "21"
     describe "-" $ do
       it "works for 42 and 2" $ do
-        execute [] "(- 42 2)" `shouldBe` Atom "40"
+        executeText [] "(- 42 2)" `shouldBe` Atom "40"
       it "works for environmental lookups" $ do
-        execute [("foo", Atom "42"), ("bar", Atom "2")] "(- foo bar)" `shouldBe` Atom "40"
+        executeText [("foo", Atom "42"), ("bar", Atom "2")] "(- foo bar)" `shouldBe` Atom "40"
       it "works for a variable number of arguments" $ do
-        execute [] "(- 99 2 3 4 5 6)" `shouldBe` Atom "79"
+        executeText [] "(- 99 2 3 4 5 6)" `shouldBe` Atom "79"
     describe "neg" $ do
       it "negates a number" $ do
-        execute [] "(neg 42)" `shouldBe` Atom "-42"
+        executeText [] "(neg 42)" `shouldBe` Atom "-42"
       it "turns negatives, to positives" $ do
-        execute [] "(neg -42)" `shouldBe` Atom "42"
+        executeText [] "(neg -42)" `shouldBe` Atom "42"
       it "uses the environment" $ do
-        execute [("foo", Atom "42")] "(neg foo)" `shouldBe` Atom "-42"
+        executeText [("foo", Atom "42")] "(neg foo)" `shouldBe` Atom "-42"
     describe "if" $ do
       it "returns the 2nd arg if truthy" $ do
-        execute [] "(if 1 42 37)" `shouldBe` Atom "42"
+        executeText [] "(if 1 42 37)" `shouldBe` Atom "42"
       it "returns the 3rd arg if falsey" $ do
-        execute [] "(if () 42 37)" `shouldBe` Atom "37"
+        executeText [] "(if () 42 37)" `shouldBe` Atom "37"
       it "does env lookups" $ do
-        execute [("f", AList []), ("p", Atom "66")] "(if f 42 p)" `shouldBe` Atom "66"
+        executeText [("f", AList []), ("p", Atom "66")] "(if f 42 p)" `shouldBe` Atom "66"
     describe "let" $ do
       it "makes a 'local' variable" $ do
-        execute [] "(let (x 42) x)" `shouldBe` Atom "42"
+        executeText [] "(let (x 42) x)" `shouldBe` Atom "42"
       it "nested shadow" $ do
-        execute [] "(let (x 42) (let (x 33) x))" `shouldBe` Atom "33"
+        executeText [] "(let (x 42) (let (x 33) x))" `shouldBe` Atom "33"
       it "multiple pairs of args can be used" $ do
-        execute [] "(let (x 42 y 33) (+ x y))" `shouldBe` Atom "75"
+        executeText [] "(let (x 42 y 33) (+ x y))" `shouldBe` Atom "75"
       it "future vars can be defined in terms of prior" $ do
-        execute [] "(let (x 42 y (+ x 33)) y)" `shouldBe` Atom "75"
+        executeText [] "(let (x 42 y (+ x 33)) y)" `shouldBe` Atom "75"
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
