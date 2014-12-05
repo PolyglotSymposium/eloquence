@@ -7,21 +7,24 @@ type Macro = (DataType -> DataType) -> [DataType] -> DataType
 data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (Show, Eq)
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
+truthyValue = AList [AList []]
+falseyValue = AList []
+
 execute env code = executeLevel env asts
   where executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, aux env value):env) rest
         executeLevel env (ast:[]) = aux env ast
         executeLevel env (ast:rest) = executeLevel env rest
-        executeLevel _ x = AList []
+        executeLevel _ x = truthyValue
         asts = (parseMany.tokenize) code
         aux env (Atom name) = case lookup name env of
           Just a -> a
           Nothing -> Atom name
         aux _ (AList []) = AList []
         aux env (AList (Atom "quote":n:_)) = n
-        aux env (AList (Atom "eq?":a:b:_)) = if aux env a == aux env b then AList [AList []] else AList []
+        aux env (AList (Atom "eq?":a:b:_)) = if aux env a == aux env b then truthyValue else falseyValue
         aux env (AList (Atom "atom?":a:_)) = case (aux env a) of
-          AList _ -> AList []
-          _ -> aux env a
+          AList _ -> falseyValue
+          _ -> truthyValue
         aux env (AList (Atom "cons":x:xs:_)) = case aux env xs of
           AList xs' -> AList ((aux env x):xs')
           _ -> AList []
@@ -33,10 +36,10 @@ execute env code = executeLevel env asts
           _ -> AList []
         aux env (AList (Atom "cond":vs)) = cond env vs
           where cond env (p:e:rest)
-                  | aux env p == AList [] = cond env rest
+                  | aux env p == falseyValue = cond env rest
                   | otherwise = aux env e
                 cond _ (_:_) = error "cond must be called with test/exp pairs"
-                cond _ _ = AList []
+                cond _ _ = falseyValue
         aux env (AList (Atom "lambda":AList params:body:_)) = Fn (map (\(Atom x) -> x) params) body
         aux env (AList (fn:rest)) = apply (aux env fn) rest env
           where apply (Fn names body) values env = let nextEnv = bind names (map (aux env) values) env in aux nextEnv body
