@@ -82,6 +82,9 @@ main = hspec $ do
     describe "+" $ do
       it "works for 1 and 1" $ do
         execute [] "(+ 1 1)" `shouldBe` Atom "2"
+      it "works for a variable number of arguments" $ do
+        execute [] "(+ 1 2 3 4 5 6)" `shouldBe` Atom "21"
+
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
