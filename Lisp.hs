@@ -18,7 +18,6 @@ execute env code = executeLevel env asts
           Nothing -> Atom name
         aux _ (AList []) = AList []
         aux env (AList (Atom "quote":n:_)) = n
-        aux env (AList (Atom "'":n:_)) = n
         aux env (AList (Atom "eq?":a:b:_)) = if aux env a == aux env b then AList [AList []] else AList []
         aux env (AList (Atom "atom?":a:_)) = case (aux env a) of
           AList _ -> AList []
