@@ -51,7 +51,11 @@ findMacro n = aux n macros
 macros = structuralMacros ++ mathyMacros
 
 structuralMacros = [(
-  "if", \_ (p:a:b:_) -> AList [Atom "cond", p, a, Atom "1", b])]
+  "if", \_ (p:a:b:_) -> AList [Atom "cond", p, a, Atom "1", b]),(
+  "let", letMacro)]
+
+letMacro _ [AList [], b] = b
+letMacro e [AList (n:v:rest), b] = AList [AList [Atom "lambda", AList [n], letMacro e [AList rest, b]], v]
 
 mathyMacros = [(
   "+",   \eval       -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0),(

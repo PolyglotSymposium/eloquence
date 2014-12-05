@@ -109,6 +109,15 @@ main = hspec $ do
         execute [] "(if () 42 37)" `shouldBe` Atom "37"
       it "does env lookups" $ do
         execute [("f", AList []), ("p", Atom "66")] "(if f 42 p)" `shouldBe` Atom "66"
+    describe "let" $ do
+      it "makes a 'local' variable" $ do
+        execute [] "(let (x 42) x)" `shouldBe` Atom "42"
+      it "nested shadow" $ do
+        execute [] "(let (x 42) (let (x 33) x))" `shouldBe` Atom "33"
+      it "multiple pairs of args can be used" $ do
+        execute [] "(let (x 42 y 33) (+ x y))" `shouldBe` Atom "75"
+      it "future vars can be defined in terms of prior" $ do
+        execute [] "(let (x 42 y (+ x 33)) y)" `shouldBe` Atom "75"
 
   describe "tokenize" $ do
     "(" `shouldTokenizeTo` [BeginList]
