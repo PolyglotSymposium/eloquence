@@ -6,10 +6,10 @@ data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
 execute env code = executeLevel env asts
-  where executeLevel env (ast:[]) = aux env ast
-        executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, aux env value):env) rest
+  where executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, aux env value):env) rest
+        executeLevel env (ast:[]) = aux env ast
         executeLevel env (ast:rest) = executeLevel env rest
-        executeLevel _ x = error (show x)
+        executeLevel _ x = AList []
         asts = (parseMany.tokenize) code
         aux env (Atom name) = case findInEnv name env of
           Just a -> a
