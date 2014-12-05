@@ -1,4 +1,4 @@
-module Eloquence where
+module Main where
 
 import Lisp (execute, executeText, parse, tokenize, bind, DataType(AList, Atom))
 import System.IO
