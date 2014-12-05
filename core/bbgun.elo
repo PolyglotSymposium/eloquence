@@ -1,1 +1,3 @@
 (def identity (lambda (x) x))
+
+(def not (lambda (x) (cond x () 1 1)))
