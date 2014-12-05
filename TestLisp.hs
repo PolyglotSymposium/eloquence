@@ -86,6 +86,13 @@ main = hspec $ do
         execute [("foo", Atom "1"), ("bar", Atom "1")] "(+ foo bar)" `shouldBe` Atom "2"
       it "works for a variable number of arguments" $ do
         execute [] "(+ 1 2 3 4 5 6)" `shouldBe` Atom "21"
+    describe "-" $ do
+      it "works for 42 and 2" $ do
+        execute [] "(- 42 2)" `shouldBe` Atom "40"
+      it "works for environmental lookups" $ do
+        execute [("foo", Atom "42"), ("bar", Atom "2")] "(- foo bar)" `shouldBe` Atom "40"
+      it "works for a variable number of arguments" $ do
+        execute [] "(- 99 2 3 4 5 6)" `shouldBe` Atom "79"
     describe "neg" $ do
       it "negates a number" $ do
         execute [] "(neg 42)" `shouldBe` Atom "-42"

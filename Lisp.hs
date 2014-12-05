@@ -56,6 +56,7 @@ structuralMacros = [(
 
 mathyMacros = [(
   "+",   \eval       -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0),(
+  "-",   \_ (x:xs)   -> AList [Atom "+", x, AList [Atom "neg", AList (Atom "+":xs)]]),(
   "neg", \eval (x:_) -> Atom . show $ -(asInt $ eval x))]
 
 asInt (Atom v) = read v
