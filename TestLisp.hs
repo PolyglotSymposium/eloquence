@@ -2,6 +2,7 @@ module TestLisp where
 
 import Test.Hspec
 import Lisp
+import TestHelpers
 
 main :: IO ()
 main = hspec $ do
@@ -20,10 +21,6 @@ main = hspec $ do
       it "is falsey, given 35 and 42" $ do
         executeText [] "(eq? 35 42)" `shouldSatisfy` isFalsey
     describe "atom?" $ do
-      it "is truthy, given 42" $ do
-        executeText [] "(atom? 42)" `shouldSatisfy` isTruthy
-      it "is falsey, given ()" $ do
-        executeText [] "(atom? ())" `shouldSatisfy` isFalsey
       context "when the environment contains 'a-list' => ()" $ do
         it "is falsey, given a-list" $ do
           executeText [("a-list", AList [])] "(atom? a-list)" `shouldSatisfy` isFalsey
@@ -116,7 +113,3 @@ main = hspec $ do
         executeText [] "(let (x 42 y 33) (+ x y))" `shouldBe` Atom "75"
       it "future vars can be defined in terms of prior" $ do
         executeText [] "(let (x 42 y (+ x 33)) y)" `shouldBe` Atom "75"
-
-
-isTruthy = not . isFalsey
-isFalsey = (== AList [])
