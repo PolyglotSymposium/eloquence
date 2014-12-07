@@ -119,37 +119,6 @@ main = hspec $ do
       it "future vars can be defined in terms of prior" $ do
         executeText [] "(let (x 42 y (+ x 33)) y)" `shouldBe` Atom "75"
 
-  describe "tokenize" $ do
-    "(" `shouldTokenizeTo` [BeginList]
-    ")" `shouldTokenizeTo` [EndList]
-    " " `shouldTokenizeTo` []
-    "()" `shouldTokenizeTo` [BeginList, EndList]
-    ")(" `shouldTokenizeTo` [EndList, BeginList]
-    ")(" `shouldTokenizeTo` [EndList, BeginList]
-    "(quote foobar)" `shouldTokenizeTo` [BeginList, RawText "quote", RawText "foobar", EndList]
-    "a" `shouldTokenizeTo` [RawText "a"]
-    "foobar" `shouldTokenizeTo` [RawText "foobar"]
-    "(empty? ())" `shouldTokenizeTo` [BeginList, RawText "empty?", BeginList, EndList, EndList]
-
-  describe "parse" $ do
-    [BeginList, EndList] `shouldParseTo` AList []
-    [BeginList, RawText "val", EndList] `shouldParseTo` AList [Atom "val"]
-    [BeginList, RawText "a", RawText "b", EndList] `shouldParseTo` AList [Atom "a", Atom "b"]
-    [RawText "val"] `shouldParseTo` Atom "val"
-    [BeginList, BeginList, EndList, EndList] `shouldParseTo` AList [AList []]
-    [BeginList, BeginList, RawText "bar", EndList, RawText "foo", EndList] `shouldParseTo` AList [AList [Atom "bar"], Atom "foo"]
-
-  describe "parseMany" $ do
-    it "works for 2 atoms" $ do
-      parseMany [RawText "foo", RawText "bar"] `shouldBe` [Atom "foo", Atom "bar"]
-    it "works for 2 lists" $ do
-      parseMany [BeginList, EndList, BeginList, EndList] `shouldBe` [AList [], AList []]
 
 isTruthy = not . isFalsey
 isFalsey = (== AList [])
-
-shouldTokenizeTo = shouldComb tokenize
-shouldParseTo = shouldComb parse
-
-shouldComb f toOpOn expected = it ("returns " ++ (show expected) ++ ", given '" ++ (show toOpOn) ++ "'") $ do
-  f toOpOn `shouldBe` expected

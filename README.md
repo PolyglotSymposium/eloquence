@@ -33,5 +33,5 @@ cabal update && cabal install hspec
 
 Run tests!
 ```
-runhaskell Test*
+runhaskell Test<file>.hs
 ```
