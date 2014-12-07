@@ -39,7 +39,7 @@ main = hspec $ do
           it "an empty list is returned." $ do
             described `shouldBe` AList []
     describe "### `first`" $ do
-      describe "returns the first element of a list" $ do
+      describe "returns the first element of a list." $ do
         describe "For example, `(first (quote (1 2 3 4 5)))`" $ do
           let described = executeText [] "(first (quote (1 2 3 4 5)))"
           it "is `1`." $ do
@@ -50,23 +50,23 @@ main = hspec $ do
             described `shouldBe` AList []
   describe "## Checking Values" $ do
     describe "### `atom?`" $ do
-      describe "is truthy, when given anything that is not a list" $ do
+      describe "is truthy, when given anything that is not a list." $ do
         describe "For example, `(atom? 42)`" $ do
           let described = executeText [] "(atom? 42)"
           it "is truthy." $ do
             described `shouldSatisfy` isTruthy
-      describe "is falsey, when given a list" $ do
+      describe "is falsey, when given a list." $ do
         describe "For example, `(atom? ())`" $ do
           let described = executeText [] "(atom? ())"
           it "is falsey." $ do
             described `shouldSatisfy` isFalsey
     describe "### `eq?`" $ do
-      describe "is truthy, when given two of the same thing" $ do
+      describe "is truthy, when given two of the same thing." $ do
         describe "For example, `(eq? 1 1)`" $ do
           let described = executeText [] "(eq? 1 1)"
           it "is truthy." $ do
             described `shouldSatisfy` isTruthy
-      describe "is falsey, when two different things" $ do
+      describe "is falsey, when two different things." $ do
         describe "For example, `(eq? 42 ())`" $ do
           let described = executeText [] "(eq? 42 ())"
           it "is falsey." $ do

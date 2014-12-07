@@ -20,24 +20,24 @@ is `(2 3 4)`.
 if an empty list is given to `tail`
 an empty list is returned.
 ### `first`
-returns the first element of a list
+returns the first element of a list.
 For example, `(first (quote (1 2 3 4 5)))`
 is `1`.
 if an empty list is given to `first`
 an empty list is returned.
 ## Checking Values
 ### `atom?`
-is truthy, when given anything that is not a list
+is truthy, when given anything that is not a list.
 For example, `(atom? 42)`
 is truthy.
-is falsey, when given a list
+is falsey, when given a list.
 For example, `(atom? ())`
 is falsey.
 ### `eq?`
-is truthy, when given two of the same thing
+is truthy, when given two of the same thing.
 For example, `(eq? 1 1)`
 is truthy.
-is falsey, when two different things
+is falsey, when two different things.
 For example, `(eq? 42 ())`
 is falsey.
 `eq?` Performs a by-value compare
