@@ -55,7 +55,7 @@ main = hspec $ do
           let described = executeText [] "(atom? 42)"
           it "is truthy." $ do
             described `shouldSatisfy` isTruthy
-      describe "is falsey, when given a list." $ do
+      describe "It returns the falsey value (aka the empty list), when given a list." $ do
         describe "For example, `(atom? ())`" $ do
           let described = executeText [] "(atom? ())"
           it "is falsey." $ do
@@ -66,7 +66,7 @@ main = hspec $ do
           let described = executeText [] "(eq? 1 1)"
           it "is truthy." $ do
             described `shouldSatisfy` isTruthy
-      describe "is falsey, when two different things." $ do
+      describe "Is falsey, when given two different things." $ do
         describe "For example, `(eq? 42 ())`" $ do
           let described = executeText [] "(eq? 42 ())"
           it "is falsey." $ do

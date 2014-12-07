@@ -30,14 +30,14 @@ an empty list is returned.
 is truthy, when given anything that is not a list.
 For example, `(atom? 42)`
 is truthy.
-is falsey, when given a list.
+It returns the falsey value (aka the empty list), when given a list.
 For example, `(atom? ())`
 is falsey.
 ### `eq?`
 is truthy, when given two of the same thing.
 For example, `(eq? 1 1)`
 is truthy.
-is falsey, when two different things.
+Is falsey, when given two different things.
 For example, `(eq? 42 ())`
 is falsey.
 `eq?` Performs a by-value compare
