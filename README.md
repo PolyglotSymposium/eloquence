@@ -46,7 +46,7 @@ is truthy.
 ### `cond`
 takes pairs of comparison-result pairs, returning the first truthy one.
 For example, `(cond () 37 1 42)`
-evaluates to `42` (since the empty list is falsey).
+evaluates to `42` (since the empty list is falsey)
 If no truthy values are given
 returns the empty list.
 ### AND MORE

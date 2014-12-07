@@ -13,6 +13,7 @@ main = hspec $ do
     [RawText "val"] `shouldParseTo` Atom "val"
     [BeginList, BeginList, EndList, EndList] `shouldParseTo` AList [AList []]
     [BeginList, BeginList, RawText "bar", EndList, RawText "foo", EndList] `shouldParseTo` AList [AList [Atom "bar"], Atom "foo"]
+    [] `shouldParseTo` Unparsable
 
   describe "parseMany" $ do
     it "works for 2 atoms" $ do

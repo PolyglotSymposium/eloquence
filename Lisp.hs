@@ -6,7 +6,7 @@ type ExecutionEnvironment = [(String, DataType)]
 
 type Macro = (DataType -> DataType) -> [DataType] -> DataType
 
-data DataType = AList [DataType] | Atom String | Fn [String] DataType deriving (Show, Eq)
+data DataType = AList [DataType] | Atom String | Fn [String] DataType | Unparsable deriving (Show, Eq)
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
 aTruthyValue = AList [AList []]
@@ -71,6 +71,7 @@ parseMany (BeginList:toParse) = AList body:parseMany rest
   where (body, rest) = untilEndList toParse []
 parseMany [] = []
 
+parse [] = Unparsable
 parse (RawText named:_) = Atom named
 parse (BeginList:toParse) = AList body
   where (body, rest) = untilEndList toParse []

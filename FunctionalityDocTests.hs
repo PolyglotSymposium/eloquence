@@ -80,7 +80,7 @@ main = hspec $ do
         describe "takes pairs of comparison-result pairs, returning the first truthy one." $ do
           describe "For example, `(cond () 37 1 42)`" $ do
             let described = executeText [] "(cond () 37 1 42)"
-            it "evaluates to `42` (since the empty list is falsey)." $ do
+            it "evaluates to `42` (since the empty list is falsey)" $ do
               described `shouldBe` Atom "42"
           describe "If no truthy values are given" $ do
             it "returns the empty list." $ do
