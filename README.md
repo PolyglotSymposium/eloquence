@@ -6,6 +6,9 @@ A toy lisp implementation in Haskell.
 ## Language Features
 See `TestLisp.hs` for specification of language.
 
+## What's in `core`?
+Nothing really, at the moment. There are just examples and the results of successful sandboxing.
+
 ## To Build
 Get Haskell platform
 ```
