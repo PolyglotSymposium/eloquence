@@ -5,10 +5,8 @@ import Lisp
 
 main :: IO ()
 main = hspec $ do
-  describe "executing text" $ do
+  describe "execution" $ do
     describe "different forms of empty lists" $ do
-      it "is an empty list, given ()" $ do
-        executeText [] "()" `shouldBe` AList []
       it "is an empty list, given ( )" $ do
         executeText [] "( )" `shouldBe` AList []
     describe "quoted values" $ do
