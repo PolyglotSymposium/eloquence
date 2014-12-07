@@ -11,7 +11,7 @@ prepends an element to a list
 For example, `(cons 42 ())`
 is `(42)`
 Remember, lists are values too!
-So, (cons () ())
+So, `(cons () ())`
 is `(())`
 ### `tail`
 returns a list containing all but the first element
@@ -25,6 +25,9 @@ For example, `(first (quote (1 2 3 4 5)))`
 is `1`
 if an empty list is given to `first`
 an empty list is returned
+### AND MORE... docs just aren't ready :)
+docs are a work in progress
+# PENDING: No reason given
 
 ## What's in `core`?
 Nothing really, at the moment. There are just examples and the results of successful sandboxing.

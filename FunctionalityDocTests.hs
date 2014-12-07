@@ -23,7 +23,7 @@ main = hspec $ do
           it "is `(42)`" $ do
             described `shouldBe` AList [Atom "42"]
       describe "Remember, lists are values too!" $ do
-        describe "So, (cons () ())" $ do
+        describe "So, `(cons () ())`" $ do
           let described = executeText [] "(cons () ())"
           it "is `(())`" $ do
             described `shouldBe` AList [AList []]
@@ -47,3 +47,6 @@ main = hspec $ do
           let described = executeText [] "(first ())"
           it "an empty list is returned" $ do
             described `shouldBe` AList []
+    describe "### AND MORE... docs just aren't ready :)" $ do
+      it "docs are a work in progress" $ do
+        pending
