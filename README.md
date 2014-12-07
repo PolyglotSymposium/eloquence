@@ -43,8 +43,14 @@ is falsey.
 `eq?` Performs a by-value compare
 so, `(eq? (quote (1 2 3)) (quote (1 2 3)))`
 is truthy.
+### `cond`
+takes pairs of comparison-result pairs, returning the first truthy one.
+For example, `(cond () 37 1 42)`
+evaluates to `42` (since the empty list is falsey).
+If no truthy values are given
+returns the empty list.
 ### AND MORE
-docs are a work in progress :)
+docs are a work in progress :). For more docs ATM, see `TestList.hs`.
 
 ## What's in `core`?
 Nothing really, at the moment. There are just examples and the results of successful sandboxing.

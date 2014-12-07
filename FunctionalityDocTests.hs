@@ -76,6 +76,15 @@ main = hspec $ do
           let described = executeText [] "(eq? (quote (1 2 3)) (quote (1 2 3)))"
           it "is truthy." $ do
             described `shouldSatisfy` isTruthy
+      describe "### `cond`" $ do
+        describe "takes pairs of comparison-result pairs, returning the first truthy one." $ do
+          describe "For example, `(cond () 37 1 42)`" $ do
+            let described = executeText [] "(cond () 37 1 42)"
+            it "evaluates to `42` (since the empty list is falsey)." $ do
+              described `shouldBe` Atom "42"
+          describe "If no truthy values are given" $ do
+            it "returns the empty list." $ do
+              executeText [] "(cond () () () ())" `shouldSatisfy` isFalsey
     describe "### AND MORE" $ do
-      it "docs are a work in progress :)" $ do
+      it "docs are a work in progress :). For more docs ATM, see `TestList.hs`." $ do
         pending
