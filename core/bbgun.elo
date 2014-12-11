@@ -11,3 +11,8 @@
   (if (eq? 0 n)
     xs
     (drop (- n 1) (tail xs)))))
+
+(def map (lambda (f xs)
+  (if xs
+    (cons (f (first xs)) (map f (tail xs)))
+    ())))
