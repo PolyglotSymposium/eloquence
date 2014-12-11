@@ -104,6 +104,8 @@ main = hspec $ do
         executeText [] "(if () 42 37)" `shouldBe` Atom "37"
       it "does env lookups" $ do
         executeText [("f", AList []), ("p", Atom "66")] "(if f 42 p)" `shouldBe` Atom "66"
+      it "does not evaluate expressions that will not be returned" $ do
+        executeText [] "(if truthy-thing 42 (i-will-break-if-hit))" `shouldBe` Atom "42"
     describe "let" $ do
       it "makes a 'local' variable" $ do
         executeText [] "(let (x 42) x)" `shouldBe` Atom "42"
