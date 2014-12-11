@@ -23,3 +23,8 @@
       (cons (first xs) (filter f (tail xs)))
       (filter f (tail xs)))
     ())))
+
+(def reduce (lambda (zero op xs)
+  (if xs
+    (reduce (op zero (first xs)) op (tail xs))
+    zero)))
