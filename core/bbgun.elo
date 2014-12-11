@@ -16,3 +16,10 @@
   (if xs
     (cons (f (first xs)) (map f (tail xs)))
     ())))
+
+(def filter (lambda (f xs)
+  (if xs
+    (if (f (first xs))
+      (cons (first xs) (filter f (tail xs)))
+      (filter f (tail xs)))
+    ())))
