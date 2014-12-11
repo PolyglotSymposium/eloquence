@@ -12,7 +12,7 @@ data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 aTruthyValue = AList [AList []]
 theFalseyValue = AList []
 
-executeText env text = execute env  ((parseMany.tokenize) text)
+executeText env = execute env.parseMany.tokenize
 
 execute = executeLevel
   where executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, aux env value):env) rest
@@ -30,7 +30,7 @@ execute = executeLevel
           AList xs' -> AList ((aux env x):xs')
           _ -> AList []
         aux env (AList (Atom "tail":xs:_)) = case aux env xs of
-          AList xs' -> AList $ (map (aux env) (drop 1 xs'))
+          AList xs' -> AList $ map (aux env) (drop 1 xs')
           _ -> AList []
         aux env (AList (Atom "first":xs:_)) = case aux env xs of
           AList (x:_) -> aux env x
@@ -67,7 +67,7 @@ mathyMacros = [(
 
 asInt (Atom v) = read v
 
-bind names values = (++) $ zip names values
+bind names = (++) . zip names
 
 parseMany ((RawText named):rest) = Atom named:parseMany rest
 parseMany (BeginList:toParse) = AList body:parseMany rest
