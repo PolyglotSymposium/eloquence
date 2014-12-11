@@ -113,3 +113,6 @@ main = hspec $ do
         executeText [] "(let (x 42 y 33) (+ x y))" `shouldBe` Atom "75"
       it "future vars can be defined in terms of prior" $ do
         executeText [] "(let (x 42 y (+ x 33)) y)" `shouldBe` Atom "75"
+  describe "passing around primitive names" $ do
+    it "works" $ do
+      executeText [] "(def a (lambda (f x) (f x))) (atom? 42)" `shouldSatisfy` isTruthy

@@ -48,7 +48,10 @@ execute = executeLevel
                   Just macro -> aux env $ macro (aux env) values
                   _ -> error $ "Could not apply fn: " ++ fn
 
-macros = structuralMacros ++ mathyMacros
+macros = primitiveOpMacros ++ structuralMacros ++ mathyMacros
+
+primitiveOpNames = ["quote", "eq?", "atom?", "cons", "tail", "first", "cond", "lambda"]
+primitiveOpMacros = map (\name -> (name, \_ args -> AList (Atom name:args))) primitiveOpNames
 
 structuralMacros = [(
   "if", \_ (p:a:b:_) -> AList [Atom "cond", p, a, Atom "1", b]),(
