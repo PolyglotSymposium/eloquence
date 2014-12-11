@@ -2,10 +2,6 @@ module Lisp where
 
 import Data.Maybe (fromMaybe)
 
-type ExecutionEnvironment = [(String, DataType)]
-
-type Macro = (DataType -> DataType) -> [DataType] -> DataType
-
 data DataType = AList [DataType] | Atom String | Fn [String] DataType | Unparsable deriving (Show, Eq)
 data Token = BeginList | EndList | RawText String deriving (Show, Eq)
 
@@ -14,11 +10,11 @@ theFalseyValue = AList []
 
 executeText env = execute env.parseMany.tokenize
 
-execute = executeLevel
-  where executeLevel env (AList [Atom "def", Atom name, value]:rest) = executeLevel ((name, aux env value):env) rest
-        executeLevel env (ast:[]) = aux env ast
-        executeLevel env (ast:rest) = executeLevel env rest
-        executeLevel _ x = aTruthyValue
+execute = topLevelExecute
+  where topLevelExecute env (AList [Atom "def", Atom name, value]:rest) = topLevelExecute ((name, aux env value):env) rest
+        topLevelExecute env (ast:[]) = aux env ast
+        topLevelExecute env (ast:rest) = topLevelExecute env rest
+        topLevelExecute _ x = aTruthyValue
         aux env (Atom name) = fromMaybe (Atom name) (lookup name env)
         aux _ (AList []) = AList []
         aux env (AList (Atom "quote":n:_)) = n
