@@ -37,7 +37,8 @@ execute = topLevelExecute
                   | otherwise = aux env e
                 cond _ (_:_) = error "cond must be called with test/exp pairs"
                 cond _ _ = theFalseyValue
-        aux env (AList (Atom "lambda":AList params:body:_)) = Fn (map (\(Atom x) -> x) params) body
+        aux env (AList (Atom "lambda":AList params:body:_)) = createLambda params body
+        aux env (AList (Atom "λ":AList params:body:_)) = createLambda params body
         aux env (AList (fn:rest)) = apply (aux env fn) rest env
           where apply (Fn names body) values env = let nextEnv = bind names (map (aux env) values) env in aux nextEnv body
                 apply (Atom fn) values env = case lookup fn macros of
@@ -46,8 +47,10 @@ execute = topLevelExecute
 
 macros = primitiveOpMacros ++ structuralMacros ++ mathyMacros
 
-primitiveOpNames = ["quote", "eq?", "atom?", "cons", "tail", "first", "cond", "lambda"]
+primitiveOpNames = ["quote", "eq?", "atom?", "cons", "tail", "first", "cond", "lambda", "λ"]
 primitiveOpMacros = map (\name -> (name, \_ args -> AList (Atom name:args))) primitiveOpNames
+
+createLambda params body = Fn (map (\(Atom x) -> x) params) body
 
 structuralMacros = [(
   "if", \_ (p:a:b:_) -> AList [Atom "cond", p, a, Atom "1", b]),(

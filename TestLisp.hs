@@ -64,6 +64,18 @@ main = hspec $ do
         executeText [] "((lambda (x y) (cons x (cons y ()))) 1 2)" `shouldBe` AList [Atom "1", Atom "2"]
       it "can accept and apply other lambdas" $ do
         executeText [] "((lambda (x) (x)) (lambda () 42))" `shouldBe` Atom "42"
+
+
+    describe "λ" $ do
+      it "returns its value, when it is simple" $ do
+        executeText [] "((λ () 42))" `shouldBe` Atom "42"
+      it "can use its param, given one" $ do
+        executeText [] "((λ (x) x) 42)" `shouldBe` Atom "42"
+      it "works for multiple values" $ do
+        executeText [] "((λ (x y) (cons x (cons y ()))) 1 2)" `shouldBe` AList [Atom "1", Atom "2"]
+      it "can accept and apply other λ" $ do
+        executeText [] "((λ (x) (x)) (λ () 42))" `shouldBe` Atom "42"
+
     describe "2 lists" $ do
       it "returns the result of the second one" $ do
         executeText [] "() (quote 42)" `shouldBe` Atom "42"
