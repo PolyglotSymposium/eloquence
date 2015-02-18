@@ -87,6 +87,7 @@ tokenize [] = []
 tokenize ('(':ss) = BeginList:tokenize ss
 tokenize (')':ss) = EndList:tokenize ss
 tokenize (' ':ss) = tokenize ss
+tokenize ('\n':ss) = tokenize ss
 tokenize text = RawText rawText:tokenize remainder
   where rawTextAndRemainder r@(t:ts) acc = 
           if t `elem` " )("
