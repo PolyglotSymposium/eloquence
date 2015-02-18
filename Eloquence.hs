@@ -25,3 +25,4 @@ main = do
       fileText <- readFile fileName
       putStrLn $ "executing " ++ fileName ++ ":"
       putStrLn $ show $ executeText [] fileText
+    _ -> putStrLn "Usage: elo [optional_fileName]"
