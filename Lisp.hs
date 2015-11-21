@@ -60,7 +60,7 @@ letMacro _ [AList [], b] = b
 letMacro e [AList (n:v:rest), b] = AList [AList [Atom "lambda", AList [n], letMacro e [AList rest, b]], v]
 
 mathyMacros = [(
-  "+",   \eval       -> Atom . show . foldl (\o -> (+) o . asInt . eval) 0),(
+  "+",   \eval       -> Atom . show . foldr (\v -> (+) (asInt $ eval v)) 0),(
   "-",   \_ (x:xs)   -> AList [Atom "+", x, AList [Atom "neg", AList (Atom "+":xs)]]),(
   "neg", \eval (x:_) -> Atom . show $ -(asInt $ eval x))]
 
